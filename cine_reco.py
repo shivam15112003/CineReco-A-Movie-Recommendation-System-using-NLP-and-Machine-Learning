@@ -9,16 +9,16 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 import re
 
-# Download NLTK stopwords
+# Downloading NLTK stopwords
 nltk.download('stopwords')
 nltk.download('punkt')
 
-# Load the movie dataset
+# Loading the movie dataset
 def load_data():
-    movies = pd.read_csv("movies.csv")  # Ensure the dataset contains 'title', 'description', and 'reviews'
+    movies = pd.read_csv("movies_dataset_300.csv")  
     return movies
 
-# Preprocess text data
+# Preprocessing text data
 def preprocess(text):
     text = text.lower()
     text = re.sub(r'[^a-zA-Z0-9]', ' ', text)
@@ -26,7 +26,7 @@ def preprocess(text):
     tokens = [word for word in tokens if word not in stopwords.words('english')]
     return ' '.join(tokens)
 
-# Train Sentiment Analysis Model
+# Training Sentiment Analysis Model
 def train_sentiment_model(movies):
     movies['processed_reviews'] = movies['reviews'].apply(preprocess)
     X_train, X_test, y_train, y_test = train_test_split(movies['processed_reviews'], movies['sentiment'], test_size=0.2, random_state=42)
@@ -40,7 +40,7 @@ def train_sentiment_model(movies):
 
     return vectorizer, classifier
 
-# Build the TF-IDF matrix for recommendations
+# Building the TF-IDF matrix for recommendations
 def build_tfidf_matrix(movies):
     movies['processed_description'] = movies['description'].apply(preprocess)
     vectorizer = TfidfVectorizer()
