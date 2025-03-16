@@ -1,22 +1,23 @@
-# 🎬 CineReco: A Movie Recommendation System using NLP & Machine Learning
+🎬 CineReco: A Movie Recommendation System using NLP & Machine Learning
 
-## 📌 Overview
-CineReco is an **AI-powered movie recommendation system** that uses **Natural Language Processing (NLP)** and **Machine Learning** to provide personalized recommendations. It also includes **sentiment analysis** to evaluate movie reviews.
+📌 Overview
+CineReco is an AI-powered movie recommendation system that uses Natural Language Processing (NLP) and Machine Learning to provide personalized recommendations. It also includes sentiment analysis to evaluate movie reviews.
 
-## 🚀 Features
-- **Personalized Movie Recommendations** using TF-IDF & Cosine Similarity.
-- **Sentiment Analysis** using Naïve Bayes classifier on movie reviews.
-- **NLP-based Text Processing** for better recommendations.
-- **User-friendly Input Handling** to suggest movies based on user preference.
-- **Large-scale Movie Database Integration** for diverse recommendations.
+🚀 Features
+- Personalized Movie Recommendations using TF-IDF & Cosine Similarity.
+- Sentiment Analysis using Naïve Bayes classifier on movie reviews.
+- NLP-based Text Processing for better recommendations.
+- User-friendly Input Handling to suggest movies based on user preference.
+- Large-scale Movie Database Integration for diverse recommendations.
+- Exception Handling for missing datasets and invalid inputs.
 
-## 🔧 Technologies Used
-- **Python**
-- **Pandas & NumPy**
-- **Scikit-Learn (ML & NLP models)**
-- **NLTK (Text Processing)**
+🔧 Technologies Used
+- Python
+- Pandas & NumPy
+- Scikit-Learn (ML & NLP models)
+- NLTK (Text Processing)
 
-## 📂 Installation & Usage
+📂 Installation & Usage
 1. Clone the repository:
    ```sh
    git clone https://github.com/shivam15112003/CineReco-A-Movie-Recommendation-System-using-NLP-and-Machine-Learning.git
@@ -32,7 +33,9 @@ CineReco is an **AI-powered movie recommendation system** that uses **Natural La
    ```
 4. Enter a movie title to get recommendations.
 
-## 📈 Future Enhancements
-- Add **Deep Learning-based recommendation**.
-- Integrate with **movie streaming platforms**.
-- Improve **user personalization** with collaborative filtering.
+📈 Future Enhancements
+- Add Deep Learning-based recommendation.
+- Integrate with movie streaming platforms.
+- Improve user personalization with collaborative filtering.
+- Enhance recommendation accuracy with additional metadata.
+- Implement a web-based or GUI version for better accessibility.
