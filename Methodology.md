@@ -1,4 +1,4 @@
-# 📌 Methodology
+📌 Methodology
 
 ## 1️⃣ Data Collection & Preprocessing
 - Collected movie data including **titles, descriptions, and user reviews**.
@@ -21,3 +21,4 @@
 - Displays **recommended movies** based on content similarity.
 
 This methodology ensures an **efficient, scalable, and personalized movie recommendation system** using **AI and NLP techniques**.
+
