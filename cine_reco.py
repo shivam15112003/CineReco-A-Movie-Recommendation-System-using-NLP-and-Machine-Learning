@@ -57,29 +57,33 @@ def build_tfidf_matrix(movies):
 
 def recommend_movies(movie_title, movies, tfidf_matrix):
     """Recommends similar movies based on cosine similarity of TF-IDF vectors."""
-    if movie_title not in movies['title'].values:
+    movie_title_lower = movie_title.lower()
+    
+    if movie_title_lower not in movies['title_lower'].values:
         return "Movie not found. Please try another title."
     
-    movie_index = movies.index[movies['title'] == movie_title][0]
+    movie_index = movies.index[movies['title_lower'] == movie_title_lower][0]
     similarity_scores = cosine_similarity(tfidf_matrix[movie_index], tfidf_matrix)[0]
     
-    # Create list of indices and similarity scores excluding the input movie itself
+    # Filter out the input movie itself
     similar_movies = [
         (i, score) for i, score in enumerate(similarity_scores) if i != movie_index
     ]
     
-    # Sort by similarity score
     similar_movies = sorted(similar_movies, key=lambda x: x[1], reverse=True)[:5]
     
+    # Always return the original title column (correct case)
     recommendations = [movies.iloc[i[0]]['title'] for i in similar_movies]
+    
     return recommendations
-
 
 if __name__ == "__main__":
     movies = load_data()
     if movies is not None:
         # Deduplicate titles here
         movies = movies.drop_duplicates(subset=['title'])
+        # Add lowercase title column for case-insensitive search
+        movies['title_lower'] = movies['title'].str.lower()
         
         vectorizer, sentiment_model = train_sentiment_model(movies)
         vectorizer, tfidf_matrix = build_tfidf_matrix(movies)
