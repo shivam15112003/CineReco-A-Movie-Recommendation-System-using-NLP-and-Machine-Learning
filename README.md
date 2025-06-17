@@ -21,7 +21,7 @@ CineReco is an AI-powered movie recommendation system that uses Natural Language
 1. Clone the repository:
    ```sh
    git clone https://github.com/shivam15112003/CineReco-A-Movie-Recommendation-System-using-NLP-and-Machine-Learning.git
-   cd CineReco
+   cd CineReco-A-Movie-Recommendation-System-using-NLP-and-Machine-Learning
    ```
 2. Install dependencies:
    ```sh
