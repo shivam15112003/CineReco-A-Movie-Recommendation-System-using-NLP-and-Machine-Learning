@@ -2,31 +2,35 @@
 
 ## 1️⃣ Data Collection & Preprocessing
 - Collected movie data including **titles, descriptions, and user reviews**.
-- Cleaned text by removing **stopwords, special characters, and tokenizing words** using NLTK.
+- Cleaned text by removing **Lowercasing, stopwords, special characters, and tokenizing words** using NLTK.
 - Applied **TF-IDF Vectorization** to convert movie descriptions into numerical representations.
 - Added **deduplication** step to ensure each movie title appears only once.
 - Created a **lowercase helper column (title_lower)** for case-insensitive title matching, while preserving original title casing for display.
+- Prepared user-item ratings dataset for collaborative filtering.
 
-## 2️⃣ Sentiment Analysis
-- Labeled movie reviews as **positive or negative**.
-- Used **Naïve Bayes classifier** with TF-IDF features to train a sentiment analysis model.
-- Sentiment model trained using Scikit-Learn and NLTK-based preprocessing.
-- Classified new movie reviews to enhance recommendation quality.
+## 2️⃣ Content-Based Filtering (Deep Learning Powered)
+- Applied Sentence-BERT (SBERT) (all-MiniLM-L6-v2 model from sentence-transformers) to generate dense 768-dimensional semantic embeddings from preprocessed movie descriptions.
+- Computed pairwise cosine similarity between all movie embeddings to measure content similarity.
+- This allowed capturing deep contextual relationships between movies beyond simple keyword matching.
 
-## 3️⃣ Movie Recommendation System
-- Computed **cosine similarity** between movie descriptions to find similar movies.
-- Designed an **NLP-powered recommendation model** based on user input.
-- Ensures recommendations exclude recommending the movie itself **(self-recommendation filter)**.
-- Returns **top 5 similar movies** for the given input title.
-- Always displays the **original properly-cased movie titles** in output for a clean user experience.
+## 3️⃣ Collaborative Filtering
+- Constructed user-item matrix from user ratings data.
+- Computed cosine similarity between items (movies) based on user rating vectors.
+- This captured similarity based on how users rated different movies.
+
+## 4️⃣ Hybrid Similarity Fusion
+- Both similarity scores (Content-Based & Collaborative Filtering) were normalized using MinMaxScaler (range 0 to 1).
+- Final similarity score calculated as weighted average: **Final Score = 𝛼 ⋅ Content Similarity + (1 − 𝛼)**
+- Default weight: **α = 0.5 (equal importance to both models)**
+- Generated top-5 recommendations by ranking final fused similarity scores.
 
 ## 4️⃣ User Interaction & Output
-- Accepts user input for any **movie title (case-insensitive matching)**.
-- Processes the title and retrieves **most relevant recommendations**.
-- Displays **recommended movies** in **original correct casing** based on content similarity.
-- Handles invalid movie inputs gracefully with appropriate messages.
+- Accepts user input for any movie title (case-insensitive).
+- Internally matches the input against a lowercased normalized title column to ensure robust search.
+- Retrieves and displays recommendations using the movie’s original title casing for better presentation.
+- Displays the Top-5 most similar movies based on the final hybrid similarity score.
+- Handles invalid or unmatched titles gracefully by prompting appropriate error messages.
 
 
-
-This methodology ensures an **efficient, scalable, and personalized movie recommendation system** using **AI and NLP techniques**.
+This methodology ensures an **efficient, scalable, and personalized movie recommendation system** using **AI,Deep Learning and NLP techniques**.
 
