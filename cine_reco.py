@@ -78,10 +78,14 @@ def recommend_movies(movie_title, movies, tfidf_matrix):
 if __name__ == "__main__":
     movies = load_data()
     if movies is not None:
+        # Deduplicate titles here
+        movies = movies.drop_duplicates(subset=['title'])
+        
         vectorizer, sentiment_model = train_sentiment_model(movies)
         vectorizer, tfidf_matrix = build_tfidf_matrix(movies)
         
         movie_title = input("Enter a movie title: ")
         recommendations = recommend_movies(movie_title, movies, tfidf_matrix)
         print("Recommended Movies:", recommendations)
+
 
