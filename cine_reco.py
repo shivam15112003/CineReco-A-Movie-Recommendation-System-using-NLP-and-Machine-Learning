@@ -1,29 +1,33 @@
 import pandas as pd
 import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.model_selection import train_test_split
-from sklearn.naive_bayes import MultinomialNB
+import re
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-import re
+from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.preprocessing import MinMaxScaler
 
-# Downloading NLTK resources
-nltk.download('stopwords')
+# Download stopwords only once
 nltk.download('punkt')
+nltk.download('stopwords')
 
-def load_data(file_path="movies_dataset_300.csv"):
-    """Loads the movie dataset from a CSV file."""
-    try:
-        movies = pd.read_csv(file_path)
-        return movies
-    except FileNotFoundError:
-        print("Error: Dataset file not found.")
-        return None
+# ------------------ Data Loading -------------------
+def load_movie_data(file_path="movies_dataset_300.csv"):
+    movies = pd.read_csv(file_path)
+    movies = movies.drop_duplicates(subset=['title'])
+    movies['title_lower'] = movies['title'].str.lower()
+    return movies
 
+def load_ratings_data(file_path="user_movie_ratings.csv"):
+    ratings = pd.read_csv(file_path)
+    user_item_matrix = ratings.pivot_table(index='user', columns='title', values='rating').fillna(0)
+    item_similarity = cosine_similarity(user_item_matrix.T)
+    item_similarity_df = pd.DataFrame(item_similarity, index=user_item_matrix.columns, columns=user_item_matrix.columns)
+    return item_similarity_df
+
+# ------------------ Preprocessing -------------------
 def preprocess(text):
-    """Preprocesses text by removing non-alphanumeric characters, lowercasing, and removing stopwords."""
     if not isinstance(text, str):
         return ""
     text = text.lower()
@@ -33,63 +37,65 @@ def preprocess(text):
     tokens = [word for word in tokens if word not in stop_words]
     return ' '.join(tokens)
 
-def train_sentiment_model(movies):
-    """Trains a Naive Bayes sentiment analysis model using TF-IDF features."""
-    movies['processed_reviews'] = movies['reviews'].apply(preprocess)
-    X_train, X_test, y_train, y_test = train_test_split(
-        movies['processed_reviews'], movies['sentiment'], test_size=0.2, random_state=42
-    )
-    
-    vectorizer = TfidfVectorizer()
-    classifier = MultinomialNB()
-    
-    X_train_tfidf = vectorizer.fit_transform(X_train)
-    classifier.fit(X_train_tfidf, y_train)
-    
-    return vectorizer, classifier
-
-def build_tfidf_matrix(movies):
-    """Builds a TF-IDF matrix for movie descriptions."""
+# ------------------ Deep Learning Content Embeddings -------------------
+def build_sbert_embeddings(movies):
+    print("Generating SBERT embeddings (this may take few seconds)...")
+    model = SentenceTransformer('all-MiniLM-L6-v2')  # lightweight, good quality
     movies['processed_description'] = movies['description'].apply(preprocess)
-    vectorizer = TfidfVectorizer()
-    tfidf_matrix = vectorizer.fit_transform(movies['processed_description'])
-    return vectorizer, tfidf_matrix
+    embeddings = model.encode(movies['processed_description'].tolist())
+    return model, embeddings
 
-def recommend_movies(movie_title, movies, tfidf_matrix):
-    """Recommends similar movies based on cosine similarity of TF-IDF vectors."""
+def content_based_similarity_sbert(movie_title, movies, embeddings):
     movie_title_lower = movie_title.lower()
-    
     if movie_title_lower not in movies['title_lower'].values:
-        return "Movie not found. Please try another title."
-    
+        return None
     movie_index = movies.index[movies['title_lower'] == movie_title_lower][0]
-    similarity_scores = cosine_similarity(tfidf_matrix[movie_index], tfidf_matrix)[0]
+    similarity_scores = cosine_similarity([embeddings[movie_index]], embeddings)[0]
+    return similarity_scores
+
+# ------------------ Hybrid Fusion -------------------
+def hybrid_similarity_fusion(movie_title, movies, embeddings, item_similarity_df, alpha=0.5, n=5):
+    cb_sim = content_based_similarity_sbert(movie_title, movies, embeddings)
     
-    # Filter out the input movie itself
-    similar_movies = [
-        (i, score) for i, score in enumerate(similarity_scores) if i != movie_index
-    ]
+    if cb_sim is None:
+        print("Movie not found in content-based dataset.")
+        return []
     
-    similar_movies = sorted(similar_movies, key=lambda x: x[1], reverse=True)[:5]
-    
-    # Always return the original title column (correct case)
-    recommendations = [movies.iloc[i[0]]['title'] for i in similar_movies]
-    
+    if movie_title not in item_similarity_df.columns:
+        print("Movie not found in collaborative filtering dataset.")
+        return []
+
+    cf_sim = item_similarity_df[movie_title].values
+
+    # Normalize both scores to 0-1
+    scaler = MinMaxScaler()
+    cb_sim_norm = scaler.fit_transform(cb_sim.reshape(-1,1)).flatten()
+    cf_sim_norm = scaler.fit_transform(cf_sim.reshape(-1,1)).flatten()
+
+    final_similarity = alpha * cb_sim_norm + (1 - alpha) * cf_sim_norm
+
+    # Sort top N results excluding self-recommendation
+    movie_indices = np.argsort(final_similarity)[::-1]
+    recommendations = []
+    for idx in movie_indices:
+        if movies.iloc[idx]['title'] != movie_title:
+            recommendations.append((movies.iloc[idx]['title'], final_similarity[idx]))
+        if len(recommendations) >= n:
+            break
+
     return recommendations
 
+# ------------------ Main -------------------
 if __name__ == "__main__":
-    movies = load_data()
-    if movies is not None:
-        # Deduplicate titles here
-        movies = movies.drop_duplicates(subset=['title'])
-        # Add lowercase title column for case-insensitive search
-        movies['title_lower'] = movies['title'].str.lower()
-        
-        vectorizer, sentiment_model = train_sentiment_model(movies)
-        vectorizer, tfidf_matrix = build_tfidf_matrix(movies)
-        
-        movie_title = input("Enter a movie title: ")
-        recommendations = recommend_movies(movie_title, movies, tfidf_matrix)
-        print("Recommended Movies:", recommendations)
+    movies = load_movie_data()
+    item_similarity_df = load_ratings_data()
+    sbert_model, embeddings = build_sbert_embeddings(movies)
 
+    movie_title = input("Enter a movie title: ")
 
+    recommendations = hybrid_similarity_fusion(movie_title, movies, embeddings, item_similarity_df, alpha=0.5, n=5)
+
+    if recommendations:
+        print("\n🎯 Top 5 Deep Learning Hybrid Recommendations:")
+        for rec, score in recommendations:
+            print(f"- {rec} (Score: {score:.4f})")
