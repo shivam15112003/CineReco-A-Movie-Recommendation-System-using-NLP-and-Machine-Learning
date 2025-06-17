@@ -1,27 +1,46 @@
-
-# 🎬 CineReco: A Movie Recommendation System using NLP & Machine Learning
+# 🎬 CineReco: Deep Learning Hybrid Movie Recommendation System
 
 ## 📌 Overview
-
-CineReco is an AI-powered movie recommendation system that uses Natural Language Processing (NLP) and Machine Learning to provide personalized recommendations. It also includes sentiment analysis to evaluate movie reviews.
+CineReco is an AI-powered movie recommendation system that combines **deep learning-based semantic similarity** (using Sentence-BERT) with **collaborative filtering** to deliver highly accurate movie recommendations. This hybrid system leverages both movie content descriptions and user behavior to provide robust, personalized suggestions.
 
 ## 🚀 Features
 
-- ✅ Personalized Movie Recommendations using TF-IDF & Cosine Similarity.
-- ✅ Sentiment Analysis using Naïve Bayes classifier on movie reviews.
 - ✅ NLP-based Text Preprocessing for better feature extraction.
 - ✅ Case-Insensitive Movie Title Matching: users can input movie titles in any case (e.g., avatar, AVATAR, Avatar) and still get accurate results.
 - ✅ Title Deduplication: ensures recommendations are not repeated for the same movie.
 - ✅ Accurate Title Output: returns recommended movies with original, correctly cased titles.
 - ✅ Excludes Self-Recommendation: filters out recommending the movie itself.
 - ✅ Exception Handling for missing datasets and invalid inputs.
+- 🔎 **Deep Learning Content-Based Filtering**: Uses SBERT (`sentence-transformers`) for semantic similarity on movie descriptions.
+- 🤝 **Collaborative Filtering**: Incorporates user rating data to enhance recommendations based on user behavior patterns.
+- ⚙ **Hybrid Fusion Model**: Combines both similarity scores into a unified ranking using normalized cosine similarity.
+- 🔬 **Preprocessing with NLP**: Efficient text cleaning using NLTK for better semantic encoding.
+- 🔢 **Cosine Similarity Fusion**: Balanced scoring between content and collaborative models.
+- ⚠ **Cold Start Friendly**: Works even if user ratings are limited, due to strong content-based model.
+
 
 ## 🔧 Technologies Used
 
-- Python
-- Pandas & NumPy
-- Scikit-Learn (ML & NLP models)
-- NLTK (Text Processing)
+- Python 3.x
+- pandas
+- numpy
+- scikit-learn
+- nltk
+- sentence-transformers (SBERT)
+- PyTorch (backend for transformers)
+
+## 📂 Dataset
+
+Two CSV files are used:
+
+### 1️⃣ movies_dataset_300.csv
+
+| title | description | review | sentiment |
+|-------|-------------|--------|-----------|
+
+### 2️⃣ user_movie_ratings.csv
+| user | title | rating |
+|------|-------|--------|
 
 ## 📂 Installation & Usage
 
@@ -47,18 +66,18 @@ python cine_reco.py
 ### Usage:
 
 - Enter any movie title (case-insensitive) when prompted.
-- The system will recommend 5 most similar movies based on content similarity.
+- The system returns the Top 5 hybrid recommendations.
 
 ## 📈 Future Enhancements
 
-- Add Deep Learning-based recommendation models.
-- Integrate with movie streaming platforms.
-- Improve personalization using collaborative filtering.
-- Enhance recommendation accuracy using additional metadata.
-- Build a web-based or GUI version for improved user experience.
+- Replace collaborative filtering with full Neural Collaborative Filtering (NCF).
+- Add DNN-based sentiment classifier for reviews.
+- Integrate streaming APIs for real-world data.
+- Build a web-based GUI (Flask / FastAPI + React).
 
 ---
 
 ## Note:
 
 The system now uses a helper lowercase column `title_lower` internally to handle case-insensitive matching, while preserving the original movie titles for output display.
+
