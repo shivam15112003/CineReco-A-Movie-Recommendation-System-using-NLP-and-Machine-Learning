@@ -61,12 +61,19 @@ def recommend_movies(movie_title, movies, tfidf_matrix):
         return "Movie not found. Please try another title."
     
     movie_index = movies.index[movies['title'] == movie_title][0]
-    similarity_scores = cosine_similarity(tfidf_matrix[movie_index], tfidf_matrix)
-    similar_movies = list(enumerate(similarity_scores[0]))
-    similar_movies = sorted(similar_movies, key=lambda x: x[1], reverse=True)[1:6]
+    similarity_scores = cosine_similarity(tfidf_matrix[movie_index], tfidf_matrix)[0]
+    
+    # Create list of indices and similarity scores excluding the input movie itself
+    similar_movies = [
+        (i, score) for i, score in enumerate(similarity_scores) if i != movie_index
+    ]
+    
+    # Sort by similarity score
+    similar_movies = sorted(similar_movies, key=lambda x: x[1], reverse=True)[:5]
     
     recommendations = [movies.iloc[i[0]]['title'] for i in similar_movies]
     return recommendations
+
 
 if __name__ == "__main__":
     movies = load_data()
