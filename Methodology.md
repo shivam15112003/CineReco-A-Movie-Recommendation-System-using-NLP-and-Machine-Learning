@@ -3,7 +3,6 @@
 ## 1️⃣ Data Collection & Preprocessing
 - Collected movie data including **titles, descriptions, and user reviews**.
 - Cleaned text by removing **Lowercasing, stopwords, special characters, and tokenizing words** using NLTK.
-- Applied **TF-IDF Vectorization** to convert movie descriptions into numerical representations.
 - Added **deduplication** step to ensure each movie title appears only once.
 - Created a **lowercase helper column (title_lower)** for case-insensitive title matching, while preserving original title casing for display.
 - Prepared user-item ratings dataset for collaborative filtering.
