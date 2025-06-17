@@ -29,3 +29,26 @@ CineReco is an AI-powered movie recommendation system that uses Natural Language
 ```bash
 git clone https://github.com/shivam15112003/CineReco-A-Movie-Recommendation-System-using-NLP-and-Machine-Learning.git
 cd CineReco-A-Movie-Recommendation-System-using-NLP-and-Machine-Learning
+Install dependencies:
+```bash
+pip install -r requirements.txt
+Run the program:
+```bash
+python cine_reco.py
+```bash
+Enter a movie title (any case) to get recommendations.
+
+
+## 📈 Future Enhancements
+- Add Deep Learning-based recommendation models.
+- Integrate with movie streaming platforms.
+- Improve personalization using collaborative filtering.
+- Enhance recommendation accuracy using additional metadata.
+- Build a web-based or GUI version for improved user experience.
+
+
+## Note:
+The system now uses a helper lowercase column title_lower internally to handle case-insensitive matching, while preserving the original movie titles for output display.
+
+
+
