@@ -17,10 +17,12 @@ CineReco is an AI-powered movie recommendation system that combines **deep learn
 - 🔬 **Preprocessing with NLP**: Efficient text cleaning using NLTK for better semantic encoding.
 - 🔢 **Cosine Similarity Fusion**: Balanced scoring between content and collaborative models.
 - ⚠ **Cold Start Friendly**: Works even if user ratings are limited, due to strong content-based model.
+- 📊 **Evaluation Support**:Calculates Precision@5 and NDCG@5 based on user-provided liked movies to measure relevance and ranking quality.
+
 
 
 ## 🔧 Technologies Used
-
+- math
 - Python 3.x
 - pandas
 - numpy
@@ -41,6 +43,13 @@ Two CSV files are used:
 ### 2️⃣ user_movie_ratings.csv
 | user | title | rating |
 |------|-------|--------|
+
+### 🧪 Evaluation Metrics
+After generating recommendations, CineReco can evaluate accuracy based on user-specified liked movies:
+
+**Precision@5**: How many of the top 5 suggestions were relevant.
+
+**NDCG@5**: How well ranked the relevant movies were.
 
 ## 📂 Installation & Usage
 
@@ -67,6 +76,7 @@ python cine_reco.py
 
 - Enter any movie title (case-insensitive) when prompted.
 - The system returns the Top 5 hybrid recommendations.
+- Evaluation: Precision@5 and NDCG@5
 
 ## 📈 Future Enhancements
 
