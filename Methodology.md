@@ -1,4 +1,4 @@
-📌 Methodology
+## 📌 Methodology
 
 ## 1️⃣ Data Collection & Preprocessing
 - Collected movie data including **titles, descriptions, and user reviews**.
