@@ -2,13 +2,14 @@ import pandas as pd
 import numpy as np
 import re
 import nltk
+import math
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import MinMaxScaler
 
-# Download stopwords only once
+# Download NLTK resources
 nltk.download('punkt')
 nltk.download('stopwords')
 
@@ -39,8 +40,8 @@ def preprocess(text):
 
 # ------------------ Deep Learning Content Embeddings -------------------
 def build_sbert_embeddings(movies):
-    print("Generating SBERT embeddings (this may take few seconds)...")
-    model = SentenceTransformer('all-MiniLM-L6-v2')  # lightweight, good quality
+    print("Generating SBERT embeddings (this may take a few seconds)...")
+    model = SentenceTransformer('all-MiniLM-L6-v2')
     movies['processed_description'] = movies['description'].apply(preprocess)
     embeddings = model.encode(movies['processed_description'].tolist())
     return model, embeddings
@@ -60,21 +61,21 @@ def hybrid_similarity_fusion(movie_title, movies, embeddings, item_similarity_df
     if cb_sim is None:
         print("Movie not found in content-based dataset.")
         return []
-    
+
     if movie_title not in item_similarity_df.columns:
         print("Movie not found in collaborative filtering dataset.")
         return []
 
     cf_sim = item_similarity_df[movie_title].values
 
-    # Normalize both scores to 0-1
+    # Normalize both scores
     scaler = MinMaxScaler()
     cb_sim_norm = scaler.fit_transform(cb_sim.reshape(-1,1)).flatten()
     cf_sim_norm = scaler.fit_transform(cf_sim.reshape(-1,1)).flatten()
 
     final_similarity = alpha * cb_sim_norm + (1 - alpha) * cf_sim_norm
 
-    # Sort top N results excluding self-recommendation
+    # Sort and get top N excluding self
     movie_indices = np.argsort(final_similarity)[::-1]
     recommendations = []
     for idx in movie_indices:
@@ -85,17 +86,50 @@ def hybrid_similarity_fusion(movie_title, movies, embeddings, item_similarity_df
 
     return recommendations
 
+# ------------------ Evaluation Metrics -------------------
+def precision_at_k(recommended, relevant, k=5):
+    recommended_at_k = recommended[:k]
+    hits = sum([1 for item in recommended_at_k if item in relevant])
+    return hits / k
+
+def ndcg_at_k(recommended, relevant, k=5):
+    dcg = 0.0
+    for i, item in enumerate(recommended[:k]):
+        if item in relevant:
+            dcg += 1 / math.log2(i + 2)
+    ideal_hits = min(len(relevant), k)
+    idcg = sum([1 / math.log2(i + 2) for i in range(ideal_hits)])
+    return dcg / idcg if idcg > 0 else 0.0
+
 # ------------------ Main -------------------
 if __name__ == "__main__":
+    # Load and prepare data
     movies = load_movie_data()
     item_similarity_df = load_ratings_data()
     sbert_model, embeddings = build_sbert_embeddings(movies)
 
-    movie_title = input("Enter a movie title: ")
+    # Input
+    movie_title = input("Enter a movie title you liked: ").strip()
+    relevant_movies_input = input("Enter other movies you liked (comma-separated): ")
+    relevant_movies = [title.strip() for title in relevant_movies_input.split(",")]
 
+    # Generate recommendations
     recommendations = hybrid_similarity_fusion(movie_title, movies, embeddings, item_similarity_df, alpha=0.5, n=5)
 
+    # Display
     if recommendations:
         print("\n🎯 Top 5 Deep Learning Hybrid Recommendations:")
         for rec, score in recommendations:
             print(f"- {rec} (Score: {score:.4f})")
+
+        recommended_titles = [rec[0] for rec in recommendations]
+
+        # Evaluation
+        p_at_5 = precision_at_k(recommended_titles, relevant_movies, k=5)
+        ndcg_5 = ndcg_at_k(recommended_titles, relevant_movies, k=5)
+
+        print(f"\n📊 Evaluation (based on your liked movies):")
+        print(f"Precision@5: {p_at_5:.2f}")
+        print(f"NDCG@5: {ndcg_5:.2f}")
+    else:
+        print("No recommendations could be generated.")
