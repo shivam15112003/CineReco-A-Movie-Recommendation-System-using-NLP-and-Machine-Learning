@@ -29,9 +29,9 @@
 - Retrieves and displays recommendations using the movie’s original title casing for better presentation.
 - Displays the Top-5 most similar movies based on the **final hybrid similarity score**.
 - Handles invalid or unmatched titles gracefully by prompting appropriate error messages.
-- Supports evaluation using:
-           **Precision@5** — relevance of recommended movies
-           **NDCG@5** — ranking quality of the results based on user-provided liked movies
+- Supports evaluation using: 
+           **Precision@5** — relevance of recommended movies.
+           **NDCG@5** — ranking quality of the results based on user-provided liked movies.
 
 
 This methodology ensures an **efficient, scalable, and personalized movie recommendation system** using **AI,Deep Learning and NLP techniques**.
