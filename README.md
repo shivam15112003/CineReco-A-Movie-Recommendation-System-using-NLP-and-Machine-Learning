@@ -1,7 +1,7 @@
 # 🎬 CineReco: Deep Learning Hybrid Movie Recommendation System
 
 ## 📌 Overview
-CineReco is an AI-powered movie recommendation system that combines **deep learning-based semantic similarity** (using Sentence-BERT) with **collaborative filtering** to deliver highly accurate movie recommendations. This hybrid system leverages both movie content descriptions and user behavior to provide robust, personalized suggestions.
+CineReco is an AI-powered movie recommendation system that combines **deep learning-based semantic similarity** (using Sentence-BERT) with **collaborative filtering** and **content filtering** to deliver highly accurate movie recommendations. This hybrid system leverages both movie content descriptions and user behavior to provide robust, personalized suggestions.
 
 ## 🚀 Features
 
